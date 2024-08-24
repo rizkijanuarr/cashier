@@ -11,6 +11,12 @@ class Order extends Model
 {
     use HasFactory;
 
+    // /App/Enum
+    protected $casts = [
+        'status' => \App\Enums\OrderStatus::class,
+        'payment_method' => \App\Enums\PaymentMethod::class,
+    ];
+
     public function orderDetails(): HasMany
     {
         return $this->hasMany(OrderDetail::class);
