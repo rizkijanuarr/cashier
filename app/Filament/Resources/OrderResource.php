@@ -61,15 +61,12 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
+            ->columns(self::getTableColumns())
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('customer.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('order_number')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('order_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('discount')
@@ -77,21 +74,39 @@ class OrderResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->summarize(
+                        Tables\Columns\Summarizers\Sum::make('total')
+                            ->money('IDR'),
+                    ),
                 Tables\Columns\TextColumn::make('profit')
                     ->numeric()
+                    ->summarize(
+                        Tables\Columns\Summarizers\Sum::make('profit')
+                            ->money('IDR'),
+                    )
                     ->sortable(),
                 Tables\Columns\TextColumn::make('payment_method')
-                    ->searchable(),
+                    ->badge()
+                    ->color('gray'),
                 Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
+                    ->badge()
+                    ->color(fn($state) => $state->getColor()),
+
+                Tables\Columns\TextColumn::make('user.name')
+                    ->numeric()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('customer.name')
+                    ->numeric()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn($state) => $state->format('d M Y H:i')),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
+                    ->formatStateUsing(fn($state) => $state->format('d M Y H:i'))
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -99,12 +114,68 @@ class OrderResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('edit-transaction')
+                    ->label('Edit Transaction')
+                    ->icon('heroicon-o-pencil')
+                    ->url(fn($record) => "/orders/{$record->order_number}"),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getTableColumns(): array
+    {
+        return [
+            Tables\Columns\TextColumn::make('order_number')
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('order_name')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('discount')
+                ->numeric()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('total')
+                ->numeric()
+                ->alignEnd()
+                ->sortable()
+                ->summarize(
+                    Tables\Columns\Summarizers\Sum::make('total')
+                        ->money('IDR'),
+                ),
+            Tables\Columns\TextColumn::make('profit')
+                ->numeric()
+                ->alignEnd()
+                ->summarize(
+                    Tables\Columns\Summarizers\Sum::make('profit')
+                        ->money('IDR'),
+                )
+                ->sortable(),
+            Tables\Columns\TextColumn::make('payment_method')
+                ->badge()
+                ->color('gray'),
+            Tables\Columns\TextColumn::make('status')
+                ->badge()
+                ->color(fn($state) => $state->getColor()),
+
+            Tables\Columns\TextColumn::make('user.name')
+                ->numeric()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('customer.name')
+                ->numeric()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('created_at')
+                ->dateTime()
+                ->sortable()
+                ->formatStateUsing(fn($state) => $state->format('d M Y H:i')),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->dateTime()
+                ->sortable()
+                ->formatStateUsing(fn($state) => $state->format('d M Y H:i'))
+                ->toggleable(isToggledHiddenByDefault: true),
+        ];
     }
 
     public static function getRelations(): array
