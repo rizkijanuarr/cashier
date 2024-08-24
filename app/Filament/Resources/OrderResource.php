@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\OrderResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\OrderResource\RelationManagers;
+use Filament\Infolists\Components\TextEntry;
 
 class OrderResource extends Resource
 {
@@ -153,6 +154,8 @@ class OrderResource extends Resource
                         }, 'receipt-' . $record->order_number . '.pdf');
                     }),
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->color('gray'),
                     Tables\Actions\EditAction::make()
                         ->color('gray'),
                     Tables\Actions\Action::make('edit-transaction')
@@ -268,10 +271,23 @@ class OrderResource extends Resource
         ];
     }
 
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist->schema([
+            TextEntry::make('order_number')->color('gray'),
+            TextEntry::make('customer.name')->placeholder('-'),
+            TextEntry::make('discount')->money('IDR')->color('gray'),
+            TextEntry::make('total')->money('IDR')->color('gray'),
+            TextEntry::make('payment_method')->badge()->color('gray'),
+            TextEntry::make('status')->badge()->color(fn($state) => $state->getColor()),
+            TextEntry::make('created_at')->dateTime()->formatStateUsing(fn($state) => $state->format('d M Y H:i'))->color('gray'),
+        ]);
+    }
+
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Resources\OrderResource\RelationManagers\OrderDetailsRelationManager::class,
         ];
     }
 
@@ -281,6 +297,7 @@ class OrderResource extends Resource
             'index' => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'view' => Pages\ViewOrder::route('/{record}/details'),
             'create-transaction' => Pages\CreateTransaction::route('{record}'),
         ];
     }
