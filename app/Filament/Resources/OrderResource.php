@@ -184,6 +184,35 @@ class OrderResource extends Resource
                             $records->each(fn(Order $order) => $order->orderDetails()->delete());
                         }),
                 ]),
+            ])
+            ->headerActions([
+                Tables\Actions\ExportAction::make()
+                    ->label('Export')
+                    ->fileDisk('public')
+                    ->color('success')
+                    ->icon('heroicon-o-document-text')
+                    ->exporter(\App\Filament\Exports\OrderExporter::class)
+                    ->formats([
+                        'xlsx' => 'Excel', // Menyediakan opsi ekspor ke Excel
+                        'csv' => 'CSV', // Menyediakan opsi ekspor ke CSV
+                    ]),
+            ])
+            ->headerActions([
+                // Tombol untuk ekspor ke Excel
+                Tables\Actions\ExportAction::make('exportExcel')
+                    ->label('Export Excel')
+                    ->fileDisk('public')
+                    ->color('success')
+                    ->icon('heroicon-o-document-text')
+                    ->exporter(\App\Filament\Exports\OrderExporter::class),
+
+                // Tombol untuk ekspor ke CSV
+                Tables\Actions\ExportAction::make('exportCsv')
+                    ->label('Export CSV')
+                    ->fileDisk('public')
+                    ->color('warning')
+                    ->icon('heroicon-o-document')
+                    ->exporter(\App\Filament\Exports\OrderExporter::class),
             ]);
     }
 
