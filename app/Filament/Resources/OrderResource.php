@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
-use App\Models\Order;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Order;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\OrderResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\OrderResource\RelationManagers;
 
 class OrderResource extends Resource
 {
@@ -138,15 +139,50 @@ class OrderResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('edit-transaction')
-                    ->label('Edit Transaction')
-                    ->icon('heroicon-o-pencil')
-                    ->url(fn($record) => "/orders/{$record->order_number}"),
+                Tables\Actions\Action::make('print')
+                    ->button()
+                    ->color('gray')
+                    ->icon('heroicon-o-printer')
+                    ->action(function (Order $record) {
+                        $pdf = Pdf::loadView('pdf.print-order', [
+                            'order' => $record,
+                        ]);
+
+                        return response()->streamDownload(function () use ($pdf) {
+                            echo $pdf->stream();
+                        }, 'receipt-' . $record->order_number . '.pdf');
+                    }),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->color('gray'),
+                    Tables\Actions\Action::make('edit-transaction')
+                        ->visible(fn(Order $record) => $record->status === \App\Enums\OrderStatus::PENDING)
+                        ->label('Edit Transaction')
+                        ->icon('heroicon-o-pencil')
+                        ->url(fn($record) => "/orders/{$record->order_number}"),
+                    Tables\Actions\Action::make('mark-as-complete')
+                        ->visible(fn(Order $record) => $record->status === \App\Enums\OrderStatus::PENDING)
+                        ->requiresConfirmation()
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(fn(Order $record) => $record->markAsComplete())
+                        ->label('Mark as Complete'),
+                    Tables\Actions\Action::make('divider')->label('')->disabled(),
+                    Tables\Actions\DeleteAction::make()
+                        ->before(function (Order $order) {
+                            $order->orderDetails()->delete();
+                            $order->delete();
+                        }),
+                ])
+                    ->color('gray'),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function (\Illuminate\Support\Collection $records) {
+                            $records->each(fn(Order $order) => $order->orderDetails()->delete());
+                        }),
                 ]),
             ]);
     }
