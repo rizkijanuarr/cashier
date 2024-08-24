@@ -22,14 +22,13 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'category_id' => Category::factory(),
-            'image' => $this->faker->word(),
-            'name' => $this->faker->name(),
-            'sku' => $this->faker->word(),
-            'description' => $this->faker->text(),
-            'stock_quantity' => $this->faker->numberBetween(-10000, 10000),
-            'price' => $this->faker->numberBetween(-10000, 10000),
-            'cost_price' => $this->faker->numberBetween(-10000, 10000),
+            'category_id' => rand(1, 10),
+            'name' => $this->faker->sentence(),
+            'sku' => $this->faker->unique()->bothify('SKU########'),
+            'description' => $this->faker->paragraph(true),
+            'stock_quantity' => 1000,
+            'cost_price' => $costPrice = $this->faker->numberBetween(10000, 100000),
+            'price' => $costPrice + ($costPrice * (20 / 100)),
         ];
     }
 }
