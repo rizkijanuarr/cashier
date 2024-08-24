@@ -52,7 +52,7 @@ class AppPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([Authenticate::class])
-            ->sidebarCollapsibleOnDesktop();
-        // ->collapsedSidebarWidth('9rem');
+            ->sidebarCollapsibleOnDesktop()
+            ->viteTheme('resources/css/filament/app/theme.css');
     }
 }
