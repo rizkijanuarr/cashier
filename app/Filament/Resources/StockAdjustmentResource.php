@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockAdjustmentResource\Pages;
-use App\Filament\Resources\StockAdjustmentResource\RelationManagers;
+use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\StockAdjustment;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 
 class StockAdjustmentResource extends Resource
 {
@@ -27,7 +28,8 @@ class StockAdjustmentResource extends Resource
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->hiddenOn(RelationManagers\StockAdjustmentsRelationManager::class),
                 Forms\Components\TextInput::make('quantity_adjusted')
                     ->required()
                     ->numeric(),
@@ -47,7 +49,8 @@ class StockAdjustmentResource extends Resource
             // ->defaultSort('product.name') // SECARA UI BAGUS
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')
-                    ->sortable(),
+                    ->sortable()
+                    ->hiddenOn(RelationManagers\StockAdjustmentsRelationManager::class),
                 Tables\Columns\TextColumn::make('quantity_adjusted')
                     ->label('Adjusted')
                     ->numeric()
@@ -70,7 +73,8 @@ class StockAdjustmentResource extends Resource
                 Tables\Filters\SelectFilter::make('product_id')
                     ->relationship('product', 'name')
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->hiddenOn(RelationManagers\StockAdjustmentsRelationManager::class),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
