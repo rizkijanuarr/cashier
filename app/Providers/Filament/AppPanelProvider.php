@@ -28,6 +28,11 @@ class AppPanelProvider extends PanelProvider
             ->id('app')
             ->path('/')
             ->login()
+            ->brandName('Cashier Parsinta')
+            ->navigationGroups([
+                'Transactions',
+                'Stock',
+            ])
             ->colors([
                 'primary' => Color::Blue,
             ])
