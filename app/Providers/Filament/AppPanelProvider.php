@@ -59,6 +59,9 @@ class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([Authenticate::class])
             ->sidebarCollapsibleOnDesktop()
-            ->viteTheme('resources/css/filament/app/theme.css');
+            ->viteTheme('resources/css/filament/app/theme.css')
+            ->plugins([
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
+            ]);
     }
 }
