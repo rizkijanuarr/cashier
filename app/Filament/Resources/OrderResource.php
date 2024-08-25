@@ -305,4 +305,11 @@ class OrderResource extends Resource
             'create-transaction' => Pages\CreateTransaction::route('{record}'),
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            OrderResource\Widgets\OrderStats::class,
+        ];
+    }
 }
