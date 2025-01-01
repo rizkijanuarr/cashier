@@ -23,11 +23,11 @@
                             <col class="sm:w-1/6">
                         </colgroup>
                         <x-table.thead>
-                            <x.table.tr>
+                            <x-table.tr>
                                 <x-table.th>Name</x-table.th>
                                 <x-table.th>Quantity</x-table.th>
                                 <x-table.th>Price</x-table.th>
-                            </x.table.tr>
+                            </x-table.tr>
                         </x-table.thead>
                         <tbody>
                         @forelse ($record->orderDetails as $orderDetail)

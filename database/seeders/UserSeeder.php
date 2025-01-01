@@ -18,5 +18,25 @@ class UserSeeder extends Seeder
             'password' => bcrypt('password'),
             'email_verified_at' => now(),
         ]);
+        \App\Models\User::create([
+            'name' => 'Rizky Darmawan',
+            'email' => 'rizkyd@gmail.com',
+            'password' => bcrypt('password'),
+            'email_verified_at' => now(),
+        ]);
+
+        \App\Models\User::create([
+            'name' => 'Joko Widodo',
+            'email' => 'jokowi@gmail.com',
+            'password' => bcrypt('password'),
+            'email_verified_at' => now(),
+        ]);
+
+        \App\Models\User::create([
+            'name' => 'Prabowo Subianto',
+            'email' => 'prabowo@gmail.com',
+            'password' => bcrypt('password'),
+            'email_verified_at' => now(),
+        ]);
     }
 }
